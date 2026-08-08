@@ -1,0 +1,6 @@
+{
+  "name": "Insights OS - Google Ads Contract Review",
+  "description": "Production-grade Google Ads API platform contract, GAQL query inventory, alert primitives, and architectural specifications for Insights OS V1 Command Center.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
