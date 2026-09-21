@@ -92,7 +92,7 @@ export const MetricsView: React.FC = () => {
           <ul className="text-xs space-y-2 text-[#202124]">
             <li className="bg-[#F8F9FA] p-2.5 rounded border border-[#DADCE0]">
               <span className="font-bold text-[#202124] block">Primary vs Secondary Actions:</span>
-              <code className="text-[#1A73E8] bg-[#E8F0FE] px-1 font-mono text-[11px] border border-[#AECBFA]">conversion_action.primary_for_action_canonical</code>
+              <code className="text-[#1A73E8] bg-[#E8F0FE] px-1 font-mono text-[11px] border border-[#AECBFA]">conversion_action.primary_for_goal</code>
               <p className="text-[#5F6368] text-[11px] mt-0.5">Must segregate primary lead actions from secondary pageview clicks.</p>
             </li>
             <li className="bg-[#F8F9FA] p-2.5 rounded border border-[#DADCE0]">

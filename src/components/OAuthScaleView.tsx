@@ -24,19 +24,19 @@ export const OAuthScaleView: React.FC = () => {
 
           <div className="space-y-3 text-xs text-[#202124]">
             <div className="bg-[#E8F0FE] p-3 rounded-lg border border-[#AECBFA] space-y-1">
-              <span className="font-bold text-[#1A73E8] block">Top-Level MCC Refresh Token Model</span>
+              <span className="font-bold text-[#1A73E8] block">Google Identity & Manager Authorization Model</span>
               <p className="text-[#1A73E8] text-[11px] leading-relaxed font-medium">
-                Insights OS requires only <strong>ONE single OAuth Refresh Token</strong> issued for the agency's top-level Google Ads Manager Account (MCC). Child client accounts are accessed hierarchically without per-client OAuth logins.
+                OAuth Refresh Tokens authorize a Google identity (user or service account). When making requests on behalf of managed child accounts, <code className="font-mono">login-customer-id</code> specifies the authorized manager account in the hierarchy. The target client account ID is supplied via the <code className="font-mono">customer_id</code> RPC argument or REST endpoint path (<code className="font-mono">customers/&#123;customer_id&#125;/googleAds:search</code>).
               </p>
             </div>
 
             <div className="bg-[#F8F9FA] p-3 rounded-lg border border-[#DADCE0] space-y-2">
-              <span className="font-bold text-[#202124] block">Required Request Headers:</span>
+              <span className="font-bold text-[#202124] block">Required Request Headers & Parameters:</span>
               <div className="bg-[#202124] text-[#81C995] p-2.5 rounded font-mono text-[11px] space-y-1 border border-[#3C4043]">
                 <div>developer-token: "YOUR_DEVELOPER_TOKEN"</div>
-                <div>login-customer-id: "AGENCY_MCC_CID"</div>
-                <div>client-customer-id: "TARGET_CLIENT_CID"</div>
+                <div>login-customer-id: "AUTHORIZED_MANAGER_CID"</div>
                 <div>Authorization: "Bearer ACCESSTOKEN..."</div>
+                <div className="text-[#9AA0A6]">// Target CID supplied via customer_id parameter/path</div>
               </div>
             </div>
 
@@ -68,17 +68,17 @@ export const OAuthScaleView: React.FC = () => {
             <div className="space-y-2 text-[11px]">
               <div className="p-2.5 bg-[#F8F9FA] border border-[#DADCE0] rounded">
                 <strong className="text-[#202124]">50 Accounts:</strong>
-                <span className="text-[#5F6368] block mt-0.5">Batch execution via 4 parallel worker threads. Full daily sync completes in ~3 minutes.</span>
+                <span className="text-[#5F6368] block mt-0.5">Batch execution via parallel background workers. Sync duration varies according to account campaign volume and metric payload sizes.</span>
               </div>
 
               <div className="p-2.5 bg-[#F8F9FA] border border-[#DADCE0] rounded">
                 <strong className="text-[#202124]">100 Accounts:</strong>
-                <span className="text-[#5F6368] block mt-0.5">Celery worker queue with exponential backoff on <code className="font-mono">RESOURCE_EXHAUSTED</code> errors. ~7 minutes sync runtime.</span>
+                <span className="text-[#5F6368] block mt-0.5">Queue-managed workers with automated exponential backoff and randomized jitter on <code className="font-mono">RESOURCE_EXHAUSTED (429)</code> HTTP responses.</span>
               </div>
 
               <div className="p-2.5 bg-[#F8F9FA] border border-[#DADCE0] rounded">
                 <strong className="text-[#202124]">500 Accounts:</strong>
-                <span className="text-[#5F6368] block mt-0.5">Distributed queue with account-level concurrency locking (max 2 queries per CID simultaneously). Must use Standard Access developer token.</span>
+                <span className="text-[#5F6368] block mt-0.5">Distributed Celery worker queues with dynamic customer-level rate limiting and stream chunking. Standard Access developer token required.</span>
               </div>
             </div>
 

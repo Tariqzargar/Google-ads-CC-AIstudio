@@ -19,7 +19,7 @@ export const FinalContractView: React.FC = () => {
         {FINAL_CONTRACT_CATEGORIES.map((cat, idx) => {
           const isMust = cat.tier.includes('MUST');
           const isNice = cat.tier.includes('NICE');
-          const isDefer = cat.tier.includes('DEFER');
+          const isDefer = cat.tier.includes('FUTURE') || cat.tier.includes('DEFER');
 
           return (
             <div

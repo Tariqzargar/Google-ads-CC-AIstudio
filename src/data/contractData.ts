@@ -4,75 +4,84 @@ export const FEASIBILITY_DATA: FeasibilityItem[] = [
   {
     screen: '01. Command Center',
     feature: 'Multi-Account Health Overview & Summary Strip',
-    status: 'Directly Feasible',
+    status: 'Direct',
+    confidence: 'High',
     apiResource: 'customer, customer_client, campaign, metrics',
-    details: 'Daily aggregate stats (cost, conversions, impressions) and health state derived from snapshot table in Django.',
+    details: 'Daily aggregate stats (cost, conversions, impressions) and health state derived from snapshot table in Insights OS.',
   },
   {
     screen: '01. Command Center',
     feature: 'Pacing Exposure Calculation (e.g. +22% / AED 8.4K)',
-    status: 'Requires Derivation',
+    status: 'Derived',
+    confidence: 'High',
     apiResource: 'campaign, campaign_budget, metrics.cost_micros',
-    details: 'Google Ads API provides campaign_budget.amount_micros and metrics.cost_micros. Pacing projection is calculated mathematically in Django based on day-of-month and remaining daily budgets.',
+    details: 'Google Ads API provides campaign_budget.amount_micros and metrics.cost_micros. Pacing projection is calculated mathematically based on day-of-month and remaining daily budgets.',
     caveat: 'Shared budgets require aggregating across all linked campaigns using campaign_budget resource.'
   },
   {
     screen: '01. Command Center',
     feature: 'Needs Attention List & 30-Day Health Heatmap',
-    status: 'Requires Derivation',
+    status: 'Derived',
+    confidence: 'Medium',
     apiResource: 'customer, campaign, conversion_action, change_event',
     details: 'Health scores and 30-day daily health bar strips are calculated deterministically from daily snapshot records in Insights OS database.',
   },
   {
     screen: '02. Accounts',
     feature: 'Account List & Custom Metric Selections (Lens)',
-    status: 'Directly Feasible',
+    status: 'Direct',
+    confidence: 'High',
     apiResource: 'customer_client, metrics',
     details: 'Sync active client accounts under MCC via customer_client query. Filter by status == ENABLED.',
   },
   {
     screen: '03. Alerts & 24-hour Journal',
-    feature: 'Alert Generation & Telegram Delivery',
-    status: 'Requires Derivation',
+    feature: 'Alert Generation & In-App Notification Dispatch',
+    status: 'Derived',
+    confidence: 'High',
     apiResource: 'Derived from API sync pipeline',
     details: 'Google Ads API does NOT send webhooks or alerts. Insights OS batch sync detects metric threshold breaches and logs alerts into local DB.',
   },
   {
     screen: '04. Reports',
     feature: 'One-Click Meeting-Ready Reports & 30d Comparison',
-    status: 'Directly Feasible',
+    status: 'Direct',
+    confidence: 'High',
     apiResource: 'campaign, ad_group, metrics, segments.date',
     details: 'Aggregated via GAQL over current 30d vs previous 30d date ranges in server backend.',
   },
   {
     screen: '05. Recommendations',
     feature: 'Google Recommendations Mirroring (Read-Only)',
-    status: 'Directly Feasible',
+    status: 'Direct',
+    confidence: 'High',
     apiResource: 'recommendation',
     details: 'Fetched via GAQL recommendation resource. Filtered by recommendation_type and status.',
-    caveat: 'V1 is strictly read-only. Mutation (Apply/Dismiss) is explicitly out of scope for V1.'
+    caveat: 'V1 is strictly read-only. Recommendation execution is explicitly out of scope for V1.'
   },
   {
     screen: '05. Recommendations',
-    feature: 'Review & Apply / Mutation Buttons in Prototype',
-    status: 'Postponed / Out of Scope',
+    feature: 'Recommendation Execution (Apply/Dismiss Buttons)',
+    status: 'Unavailable',
+    confidence: 'Low',
     apiResource: 'RecommendationService.ApplyRecommendation',
-    details: 'Prototype shows "Review & Apply". In V1, this is display-only or disabled per locked V1 product boundary.',
+    details: 'Automated recommendation execution is moved to FUTURE ROADMAP — OUT OF V1.',
   },
   {
     screen: '06. Change Lab',
-    feature: 'Historical Change Audit Ledger & Outcome Analysis',
-    status: 'Feasible with Caveats',
-    apiResource: 'change_event',
-    details: 'Google Ads API change_event resource only retains 30 days of change history. Insights OS MUST snapshot change_event records into PostgreSQL immediately to support long-term outcome analysis beyond 30 days.',
-    caveat: 'change_event does NOT record reason or operator Intent; staff must input intent manually into Insights OS.'
+    feature: 'Change Lab & Automated Mutation Outcome Workspace',
+    status: 'Unavailable',
+    confidence: 'Low',
+    apiResource: 'change_event, MutateService',
+    details: 'Interactive Change Lab workspace and automated mutation tracking moved to FUTURE ROADMAP — OUT OF V1.',
   },
   {
     screen: '07. AI Setup Studio',
     feature: 'Campaign Setup Wizard & AI Plan Builder',
-    status: 'Postponed / Out of Scope',
-    apiResource: 'CampaignService, AdGroupService, etc.',
-    details: 'V1 product boundary strictly prohibits campaign creation, drafting, or mutation on Google Ads. Must remain deferred for V1.',
+    status: 'Unavailable',
+    confidence: 'Low',
+    apiResource: 'CampaignService, AdGroupService',
+    details: 'Campaign creation and write-backs moved to FUTURE ROADMAP — OUT OF V1.',
   }
 ];
 
@@ -168,7 +177,7 @@ export const RESOURCE_INVENTORY: ResourceInventoryItem[] = [
   {
     resourceName: 'conversion_action',
     identifiers: 'conversion_action.id',
-    requiredFields: ['conversion_action.id', 'conversion_action.name', 'conversion_action.status', 'conversion_action.type', 'conversion_action.category', 'conversion_action.primary_for_action_canonical', 'conversion_action.include_in_conversions_metric', 'conversion_action.counting_type', 'conversion_action.attribution_model_settings.attribution_model'],
+    requiredFields: ['conversion_action.id', 'conversion_action.name', 'conversion_action.status', 'conversion_action.type', 'conversion_action.category', 'conversion_action.primary_for_goal', 'conversion_action.include_in_conversions_metric', 'conversion_action.counting_type', 'conversion_action.attribution_model_settings.attribution_model'],
     mccImplications: 'Can be defined at Account level or Cross-Account MCC Conversion level.',
     campaignTypeLimitations: 'None.',
     changesHistorically: 'Statuses change if tags stop firing (e.g. INACTIVE / HIDDEN).',
@@ -320,7 +329,7 @@ WHERE campaign.advertising_channel_type = 'SEARCH'
   conversion_action.status,
   conversion_action.type,
   conversion_action.category,
-  conversion_action.primary_for_action_canonical,
+  conversion_action.primary_for_goal,
   conversion_action.include_in_conversions_metric,
   conversion_action.owner_customer
 FROM conversion_action
@@ -372,11 +381,12 @@ WHERE segments.date DURING LAST_30_DAYS
   change_event.new_resource
 FROM change_event
 WHERE change_event.change_date_time >= '{LAST_SYNC_TIMESTAMP}'
-ORDER BY change_event.change_date_time DESC`,
+ORDER BY change_event.change_date_time DESC
+LIMIT 10000`,
     segments: ['None'],
     datePredicates: "change_event.change_date_time >= 'YYYY-MM-DD HH:MM:SS'",
     incompatibilities: ['30-day API hard retention limit. Older data cannot be queried!'],
-    paginationNotes: 'Must be stored in PostgreSQL immediately upon ingestion.',
+    paginationNotes: 'Mandatory LIMIT 10000 enforced. Safe continuation uses change_date_time timestamp cursor or next_page_token.',
     campaignTypeRestrictions: 'All resources'
   },
   {
@@ -514,8 +524,8 @@ export const API_TRAPS: ApiTrap[] = [
     title: '6. Missing or Incorrect login-customer-id Header',
     category: 'Authentication',
     symptom: 'API throws `PERMISSION_DENIED: The caller does not have permission` even though OAuth token is valid.',
-    rootCause: 'When accessing client accounts via an MCC Manager token, the HTTP header `login-customer-id` MUST be set to the top-level MCC Customer ID.',
-    correctImplementation: 'Set `login-customer-id: {MCC_CUSTOMER_ID}` in Google Ads API client config for all request calls.',
+    rootCause: 'When accessing client accounts through a manager hierarchy, the HTTP header login-customer-id MUST specify the appropriate authorized Manager Account ID managing that target customer.',
+    correctImplementation: 'Set `login-customer-id: {MANAGER_CUSTOMER_ID}` to specify the authorized manager account in the account hierarchy.',
     impactLevel: 'CRITICAL (Silent Corruption)'
   }
 ];
@@ -588,13 +598,31 @@ export const FINAL_CONTRACT_CATEGORIES: FinalContractCategory[] = [
     ]
   },
   {
-    tier: 'DEFER (V2 / Out of Scope)',
+    tier: 'FUTURE ROADMAP — OUT OF V1',
     color: 'rose',
     items: [
       {
+        name: 'Telegram & External Delivery',
+        description: 'Direct alert pushing to Telegram bots or Slack webhook channels.',
+        justification: 'External delivery channels are out of V1 scope. V1 supports internal in-app alert journaling only.',
+        resource: 'External Webhooks'
+      },
+      {
+        name: 'Change Lab & Historical Mutation Ledger',
+        description: 'Interactive change lab workspace and automated mutation tracking.',
+        justification: 'Interactive change lab workspace and execution workflows belong in future releases.',
+        resource: 'Change Lab'
+      },
+      {
+        name: 'Recommendation Execution',
+        description: 'Applying or dismissing recommendations automatically via API (RecommendationService).',
+        justification: 'V1 provides read-only mirroring. Automated execution is out of V1 scope.',
+        resource: 'RecommendationService'
+      },
+      {
         name: 'Campaign Creation / Mutation APIs',
         description: 'CampaignService.Mutate, AdGroupService.Mutate, BiddingStrategy.Mutate.',
-        justification: 'V1 is strictly read-only. No mutation on Google Ads permitted in V1.',
+        justification: 'V1 is strictly read-only and diagnostic. No mutation on Google Ads permitted in V1.',
         resource: 'Mutate Services'
       },
       {
@@ -602,18 +630,6 @@ export const FINAL_CONTRACT_CATEGORIES: FinalContractCategory[] = [
         description: 'Drafting or pushing new campaign structures to Google Ads.',
         justification: 'Out of V1 product scope. Must remain deferred.',
         resource: 'Campaign Drafts'
-      },
-      {
-        name: 'Change Lab Automated Mutation Execution',
-        description: 'Applying bidding changes or budget edits automatically from Change Lab.',
-        justification: 'Out of V1 scope. Human operator executes in Google Ads UI; Insights OS measures read-only impact.',
-        resource: 'Change Lab Mutate'
-      },
-      {
-        name: 'Auction Insights Heavy Scrapes',
-        description: 'Competitor domain impression share breakdown queries.',
-        justification: 'High API query cost and restricted availability. Defer to manual or periodic on-demand sync.',
-        resource: 'Custom Reporting'
       }
     ]
   }

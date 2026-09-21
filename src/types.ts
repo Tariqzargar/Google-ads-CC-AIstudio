@@ -1,4 +1,11 @@
 export type SectionId = 
+  | 'freeze'
+  | 'gate_d_addendum'
+  | 'architect_review'
+  | 'gate_a'
+  | 'gate_b'
+  | 'gate_c'
+  | 'foundation'
   | 'feasibility'
   | 'resources'
   | 'gaql'
@@ -10,10 +17,20 @@ export type SectionId =
   | 'traps'
   | 'final';
 
+export type CapabilityStatus = 
+  | 'Direct'
+  | 'Derived'
+  | 'Partial'
+  | 'External Evidence Required'
+  | 'Unavailable';
+
+export type ConfidenceLevel = 'High' | 'Medium' | 'Low';
+
 export interface FeasibilityItem {
   screen: string;
   feature: string;
-  status: 'Directly Feasible' | 'Feasible with Caveats' | 'Requires Derivation' | 'Impossible/Unreliable' | 'Postponed / Out of Scope';
+  status: CapabilityStatus;
+  confidence: ConfidenceLevel;
   apiResource: string;
   details: string;
   caveat?: string;
@@ -25,7 +42,7 @@ export interface ResourceInventoryItem {
   requiredFields: string[];
   mccImplications: string;
   campaignTypeLimitations: string;
-  changesHistorically: boolean;
+  changesHistorically: string | boolean;
   recommendedSyncFrequency: string;
   recommendedStorageGrain: string;
   purpose: string;
@@ -68,7 +85,7 @@ export interface ApiTrap {
 }
 
 export interface FinalContractCategory {
-  tier: 'MUST INGEST (V1 Core)' | 'NICE TO HAVE (V1 Optional)' | 'DEFER (V2 / Out of Scope)';
+  tier: 'MUST INGEST (V1 Core)' | 'NICE TO HAVE (V1 Optional)' | 'FUTURE ROADMAP — OUT OF V1';
   color: string;
   items: {
     name: string;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { SectionId } from '../types';
-import { ShieldCheck, FileCode, AlertTriangle, Layers, Database, Cpu, CheckCircle2, Copy, Download, RefreshCw } from 'lucide-react';
+import { ShieldCheck, FileCode, AlertTriangle, Layers, Database, Cpu, CheckCircle2, Copy, Download, RefreshCw, Award, Target, Boxes } from 'lucide-react';
 
 interface HeaderProps {
   activeSection: SectionId;
@@ -16,6 +16,13 @@ export const Header: React.FC<HeaderProps> = ({
   copied
 }) => {
   const tabs: { id: SectionId; label: string; icon: React.FC<{ className?: string }> }[] = [
+    { id: 'freeze', label: 'FINAL ARCHITECTURE FREEZE', icon: ShieldCheck },
+    { id: 'gate_d_addendum', label: 'Gate D Addendum D-01', icon: FileCode },
+    { id: 'architect_review', label: 'Product Architect Review', icon: Target },
+    { id: 'gate_a', label: 'Gate A Board Validation', icon: Award },
+    { id: 'gate_b', label: 'Gate B Domain Model & Entities', icon: Boxes },
+    { id: 'gate_c', label: 'Gate C Application Services & Workflows', icon: Cpu },
+    { id: 'foundation', label: 'Platform Foundation & Security', icon: Layers },
     { id: 'feasibility', label: '1. Feasibility Matrix', icon: CheckCircle2 },
     { id: 'resources', label: '2. Resource Inventory', icon: Database },
     { id: 'gaql', label: '3. GAQL Contract', icon: FileCode },
@@ -50,7 +57,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1E8E3E] opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#1E8E3E]"></span>
               </span>
-              <span>API v18 Validated</span>
+              <span>Google Ads API v25 Verified</span>
             </div>
 
             <button
